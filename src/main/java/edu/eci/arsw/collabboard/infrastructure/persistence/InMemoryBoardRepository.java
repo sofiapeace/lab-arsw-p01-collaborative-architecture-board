@@ -21,14 +21,21 @@ public class InMemoryBoardRepository implements BoardRepository {
 
     @Override
     public Board save(Board board) {
-        // TODO LAB-04: decide and document the semantics of save/replace.
+        // Semantics: upsert. put() overwrites unconditionally whether the id
+        // already existed or not. This repository does not decide whether an
+        // overwrite is "allowed" — that business rule (a replace must target
+        // an existing board) belongs to BoardApplicationService, which checks
+        // existsById() before calling save() for a replace.
         boards.put(board.id(), board);
         return board;
     }
 
     @Override
     public Optional<Board> findById(String boardId) {
-        // TODO LAB-04: validate whether defensive copying is necessary with the current immutable model.
+        // No defensive copy needed here: Board is an immutable record whose
+        // compact constructor already does List.copyOf(elements), and it has
+        // no mutator methods. The reference handed back cannot be used to
+        // corrupt what is stored in this map.
         return Optional.ofNullable(boards.get(boardId));
     }
 
